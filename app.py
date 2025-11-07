@@ -1,44 +1,41 @@
-from flask import Flask, request, render_template_string
-import os, requests
+from flask import Flask, request, jsonify, render_template
+import requests
+import json
 
 app = Flask(__name__)
 
-REMOTE_STORE_URL = os.environ.get("REMOTE_STORE_URL")
-
-html_form = """
-<!doctype html>
-<html>
-<head><title>Submit Form</title></head>
-<body>
-  <h2>Enter Details</h2>
-  <form method="post" action="/submit">
-    <label>Name:</label><br><input name="name" required><br>
-    <label>Age:</label><br><input name="age" type="number" required><br>
-    <label>Email:</label><br><input name="email" type="email" required><br><br>
-    <button type="submit">Submit</button>
-  </form>
-</body>
-</html>
-"""
+# Replace with your actual JSONBin info
+JSONBIN_URL = "https://api.jsonbin.io/v3/b/690e205243b1c97be99f2a05e"
+HEADERS = {
+    "Content-Type": "application/json",
+    "X-Master-Key": "$2a$10$RW4XxG0nUA7g1/CICdo8xOFdiIt36k1BrQmcMM6O5EBcS0kF.J3KG"  # from your JSONBin dashboard
+}
 
 @app.route('/')
 def index():
-    return render_template_string(html_form)
+    return render_template('index.html')
 
 @app.route('/submit', methods=['POST'])
-def submit():
-    data = request.form.to_dict()
+def submit_form():
+    # Collect form data
+    name = request.form.get('name')
+    email = request.form.get('email')
+    message = request.form.get('message')
 
-    if not REMOTE_STORE_URL:
-        return "REMOTE_STORE_URL not set on server.", 500
+    # Create the JSON structure
+    form_data = {
+        "name": name,
+        "email": email,
+        "message": message
+    }
 
-    try:
-        resp = requests.post(REMOTE_STORE_URL, json=data, timeout=10)
-        resp.raise_for_status()
-    except Exception as e:
-        return f"Error sending to receiver: {e}", 500
+    # Send to JSONBin
+    response = requests.put(JSONBIN_URL, headers=HEADERS, data=json.dumps(form_data))
 
-    return f"<h3>Form submitted successfully!</h3><p>Response: {resp.text}</p>"
+    if response.status_code == 200:
+        return jsonify({"status": "success", "message": "Data saved to JSONBin!"})
+    else:
+        return jsonify({"status": "error", "message": f"Failed to save data: {response.text}"})
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=6000)
