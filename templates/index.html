@@ -1,67 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form Submission</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    form {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      width: 300px;
-    }
-    input, textarea {
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      background: #007BFF;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Form Submission</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f2f2f2;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input, textarea {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #message {
+            margin-top: 15px;
+            font-weight: bold;
+            color: green;
+        }
+    </style>
 </head>
 <body>
-  <form id="dataForm" method="POST" action="/submit">
-    <h2>Submit Your Details</h2>
-    <input type="text" name="name" placeholder="Enter your name" required>
-    <input type="email" name="email" placeholder="Enter your email" required>
-    <textarea name="message" placeholder="Enter your message" rows="4" required></textarea>
-    <button type="submit">Submit</button>
-  </form>
+    <h2>Submit Form</h2>
+    <form id="form">
+        <input type="text" name="name" placeholder="Your Name" required><br>
+        <input type="email" name="email" placeholder="Your Email" required><br>
+        <textarea name="message" placeholder="Your Message" required></textarea><br>
+        <button type="submit">Submit</button>
+    </form>
 
-  <script>
-    const form = document.getElementById("dataForm");
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const formData = new FormData(form);
-      const response = await fetch("/submit", {
-        method: "POST",
-        body: formData
-      });
-      const result = await response.json();
-      alert(result.message);
-    });
-  </script>
+    <div id="message"></div>
+
+    <script>
+        document.getElementById("form").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            const response = await fetch("/submit", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+
+            // Instead of alert, display message
+            const msg = document.getElementById("message");
+            if (result.status === "success") {
+                msg.textContent = "✅ Thank you! Your response has been submitted.";
+                msg.style.color = "green";
+                this.reset(); // clears the form
+            } else {
+                msg.textContent = "❌ Failed to submit. Please try again.";
+                msg.style.color = "red";
+            }
+        });
+    </script>
 </body>
 </html>
