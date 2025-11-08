@@ -5,10 +5,10 @@ import json
 app = Flask(__name__)
 
 # Replace with your actual JSONBin info
-JSONBIN_URL = "https://api.jsonbin.io/v3/b/690e205243b1c97be99f2a05e"
+JSONBIN_URL = "https://api.jsonbin.io/v3/b/690e205243b1c97be99f2a05"
 HEADERS = {
     "Content-Type": "application/json",
-    "X-Master-Key": "$2a$10$RW4XxG0nUA7g1/CICdo8xOFdiIt36k1BrQmcMM6O5EBcS0kF.J3KG"  # from your JSONBin dashboard
+    "X-Master-Key": "$2a$10$WU7PPo/z/W99mt.UMHbcSuHe3BW1x/Dn.CrJcCtb.vw8iXyJZUlM6"  # from your JSONBin dashboard
 }
 
 @app.route('/')
